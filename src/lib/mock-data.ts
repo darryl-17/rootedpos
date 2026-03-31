@@ -105,8 +105,8 @@ function generateSales(): Sale[] {
       tax: Math.round(taxTotal),
       total,
       paymentMethod: method,
-      cashTendered: method === 'cash' ? Math.ceil(total / 5) * 5 : undefined,
-      change: method === 'cash' ? Math.round((Math.ceil(total / 5) * 5 - total) * 100) / 100 : undefined,
+      cashTendered: method === 'cash' ? Math.ceil(total / 500) * 500 : undefined,
+      change: method === 'cash' ? Math.ceil(total / 500) * 500 - total : undefined,
       note: '',
       storeId: 'store-1',
     });
