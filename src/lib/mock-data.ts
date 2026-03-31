@@ -173,7 +173,7 @@ export function seedData() {
     localStorage.setItem('swiftpos_businessSettings', JSON.stringify(defaultBusinessSettings));
     localStorage.setItem('swiftpos_heldOrders', JSON.stringify([]));
     localStorage.setItem('swiftpos_currentStore', 'store-1');
-    localStorage.setItem('swiftpos_seeded', 'true');
+    localStorage.setItem('swiftpos_seed_version', SEED_VERSION);
   }
 }
 
