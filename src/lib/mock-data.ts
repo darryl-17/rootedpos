@@ -57,7 +57,7 @@ export const defaultCustomers: Customer[] = customerNames.map(([first, last], i)
   notes: '',
   loyaltyPoints: Math.floor(Math.random() * 500) + 10,
   totalVisits: Math.floor(Math.random() * 30) + 1,
-  totalSpent: Math.round((Math.random() * 800 + 50) * 100) / 100,
+  totalSpent: Math.round(Math.random() * 400000 + 25000),
   lastVisit: new Date(Date.now() - Math.random() * 14 * 86400000).toISOString(),
 }));
 
