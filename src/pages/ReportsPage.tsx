@@ -3,8 +3,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getData } from '@/lib/mock-data';
 import { Sale, Product, Category, Employee } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import {
-  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  BarChart, Bar, PieChart, Pie, Cell,
   XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend
 } from 'recharts';
 
@@ -14,7 +15,6 @@ export default function ReportsPage() {
   const sales = useMemo(() => getData<Sale[]>('sales'), []);
   const products = useMemo(() => getData<Product[]>('products'), []);
   const categories = useMemo(() => getData<Category[]>('categories'), []);
-  const employees = useMemo(() => getData<Employee[]>('employees'), []);
 
   const totalSales = sales.reduce((s, sale) => s + sale.total, 0);
   const refundedSales = sales.filter(s => s.refunded);
@@ -22,22 +22,20 @@ export default function ReportsPage() {
   const netSales = totalSales - totalRefunds;
   const avgTransaction = sales.length ? totalSales / sales.length : 0;
 
-  // Daily sales for bar chart
   const dailySales = useMemo(() => {
     const map = new Map<string, number>();
     for (let i = 13; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000);
-      const key = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const key = d.toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
       map.set(key, 0);
     }
     sales.forEach(s => {
-      const key = new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      const key = new Date(s.date).toLocaleDateString('fr-FR', { month: 'short', day: 'numeric' });
       if (map.has(key)) map.set(key, (map.get(key) || 0) + s.total);
     });
-    return [...map.entries()].map(([date, total]) => ({ date, total: Math.round(total * 100) / 100 }));
+    return [...map.entries()].map(([date, total]) => ({ date, total: Math.round(total) }));
   }, [sales]);
 
-  // Sales by item
   const itemSales = useMemo(() => {
     const map = new Map<string, { name: string; qty: number; revenue: number }>();
     sales.forEach(s => s.items.forEach(i => {
@@ -48,7 +46,6 @@ export default function ReportsPage() {
     return [...map.values()].sort((a, b) => b.revenue - a.revenue);
   }, [sales]);
 
-  // Sales by category
   const categorySales = useMemo(() => {
     const map = new Map<string, number>();
     sales.forEach(s => s.items.forEach(i => {
@@ -58,11 +55,10 @@ export default function ReportsPage() {
     }));
     return [...map.entries()].map(([catId, value]) => ({
       name: categories.find(c => c.id === catId)?.name || 'Other',
-      value: Math.round(value * 100) / 100,
+      value: Math.round(value),
     }));
   }, [sales, products, categories]);
 
-  // Sales by employee
   const employeeSales = useMemo(() => {
     const map = new Map<string, { name: string; count: number; total: number }>();
     sales.forEach(s => {
@@ -73,11 +69,10 @@ export default function ReportsPage() {
     return [...map.values()].sort((a, b) => b.total - a.total);
   }, [sales]);
 
-  // Payment methods
   const paymentData = useMemo(() => {
     const map = new Map<string, number>();
     sales.forEach(s => map.set(s.paymentMethod, (map.get(s.paymentMethod) || 0) + s.total));
-    return [...map.entries()].map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value: Math.round(value * 100) / 100 }));
+    return [...map.entries()].map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value: Math.round(value) }));
   }, [sales]);
 
   return (
@@ -85,10 +80,10 @@ export default function ReportsPage() {
       <h1 className="text-2xl font-bold">Reports & Analytics</h1>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Sales</p><p className="text-xl font-bold">${totalSales.toFixed(2)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Refunds</p><p className="text-xl font-bold text-destructive">${totalRefunds.toFixed(2)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Net Sales</p><p className="text-xl font-bold text-primary">${netSales.toFixed(2)}</p></CardContent></Card>
-        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Avg Transaction</p><p className="text-xl font-bold">${avgTransaction.toFixed(2)}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Total Sales</p><p className="text-lg font-bold">{formatCFA(totalSales)}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Refunds</p><p className="text-lg font-bold text-destructive">{formatCFA(totalRefunds)}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Net Sales</p><p className="text-lg font-bold text-primary">{formatCFA(netSales)}</p></CardContent></Card>
+        <Card><CardContent className="p-4"><p className="text-xs text-muted-foreground">Avg Transaction</p><p className="text-lg font-bold">{formatCFA(avgTransaction)}</p></CardContent></Card>
       </div>
 
       <Tabs defaultValue="summary">
@@ -109,7 +104,7 @@ export default function ReportsPage() {
                   <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                   <XAxis dataKey="date" tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
                   <YAxis tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }} />
-                  <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} />
+                  <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} formatter={(value: number) => [formatCFA(value), 'Total']} />
                   <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -132,8 +127,8 @@ export default function ReportsPage() {
                     <tr key={i} className="border-b last:border-0">
                       <td className="p-3 font-medium">{item.name}</td>
                       <td className="p-3 text-right">{item.qty}</td>
-                      <td className="p-3 text-right">${item.revenue.toFixed(2)}</td>
-                      <td className="p-3 text-right text-muted-foreground">${(item.revenue / item.qty).toFixed(2)}</td>
+                      <td className="p-3 text-right">{formatCFA(item.revenue)}</td>
+                      <td className="p-3 text-right text-muted-foreground">{formatCFA(item.revenue / item.qty)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -149,10 +144,10 @@ export default function ReportsPage() {
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
-                    <Pie data={categorySales} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                    <Pie data={categorySales} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, value }) => `${name}: ${formatCFA(value)}`}>
                       {categorySales.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                     </Pie>
-                    <Tooltip />
+                    <Tooltip formatter={(value: number) => formatCFA(value)} />
                     <Legend />
                   </PieChart>
                 </ResponsiveContainer>
@@ -169,7 +164,7 @@ export default function ReportsPage() {
                     {categorySales.map((c, i) => (
                       <tr key={i} className="border-b last:border-0">
                         <td className="p-3 font-medium">{c.name}</td>
-                        <td className="p-3 text-right">${c.value.toFixed(2)}</td>
+                        <td className="p-3 text-right">{formatCFA(c.value)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -193,7 +188,7 @@ export default function ReportsPage() {
                     <tr key={i} className="border-b last:border-0">
                       <td className="p-3 font-medium">{e.name}</td>
                       <td className="p-3 text-right">{e.count}</td>
-                      <td className="p-3 text-right">${e.total.toFixed(2)}</td>
+                      <td className="p-3 text-right">{formatCFA(e.total)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -211,7 +206,7 @@ export default function ReportsPage() {
                   <Pie data={paymentData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
                     {paymentData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(value: number) => formatCFA(value)} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>

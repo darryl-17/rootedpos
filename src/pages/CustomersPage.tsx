@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { getData, setData } from '@/lib/mock-data';
 import { Customer, Sale } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 
 const emptyCustomer: Partial<Customer> = { firstName: '', lastName: '', email: '', phone: '', address: '', birthday: '', notes: '', loyaltyPoints: 0, totalVisits: 0, totalSpent: 0, lastVisit: '' };
@@ -30,11 +31,7 @@ export default function CustomersPage() {
   const save = () => {
     if (!editCustomer.firstName || !editCustomer.lastName) return;
     const isNew = !editCustomer.id;
-    const customer: Customer = {
-      ...(emptyCustomer as Customer),
-      ...editCustomer,
-      id: editCustomer.id || `cust-${Math.random().toString(36).slice(2)}`,
-    };
+    const customer: Customer = { ...(emptyCustomer as Customer), ...editCustomer, id: editCustomer.id || `cust-${Math.random().toString(36).slice(2)}` };
     const updated = isNew ? [...customers, customer] : customers.map(c => c.id === customer.id ? customer : c);
     setCustomers(updated);
     setData('customers', updated);
@@ -83,7 +80,7 @@ export default function CustomersPage() {
                     <td className="p-3 text-muted-foreground">{c.email}</td>
                     <td className="p-3 text-muted-foreground">{c.phone}</td>
                     <td className="p-3 text-right">{c.totalVisits}</td>
-                    <td className="p-3 text-right">${c.totalSpent.toFixed(2)}</td>
+                    <td className="p-3 text-right">{formatCFA(c.totalSpent)}</td>
                     <td className="p-3 text-right font-medium text-primary">{c.loyaltyPoints}</td>
                     <td className="p-3 text-right">
                       <Button variant="ghost" size="icon" className="h-8 w-8" onClick={e => { e.stopPropagation(); setEditCustomer(c); setShowForm(true); }}><Edit className="h-4 w-4" /></Button>
@@ -96,7 +93,6 @@ export default function CustomersPage() {
         </Card>
       )}
 
-      {/* Customer Form */}
       <Dialog open={showForm} onOpenChange={setShowForm}>
         <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>{editCustomer.id ? 'Edit Customer' : 'Add Customer'}</DialogTitle></DialogHeader>
@@ -118,7 +114,6 @@ export default function CustomersPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Customer Profile */}
       <Dialog open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
         <DialogContent className="max-w-lg">
           {selectedCustomer && (
@@ -129,7 +124,7 @@ export default function CustomersPage() {
                   <div><span className="text-muted-foreground">Email:</span> {selectedCustomer.email}</div>
                   <div><span className="text-muted-foreground">Phone:</span> {selectedCustomer.phone}</div>
                   <div><span className="text-muted-foreground">Loyalty Points:</span> <span className="font-bold text-primary">{selectedCustomer.loyaltyPoints}</span></div>
-                  <div><span className="text-muted-foreground">Total Spent:</span> ${selectedCustomer.totalSpent.toFixed(2)}</div>
+                  <div><span className="text-muted-foreground">Total Spent:</span> {formatCFA(selectedCustomer.totalSpent)}</div>
                 </div>
                 <div>
                   <h3 className="font-medium mb-2">Purchase History</h3>
@@ -139,9 +134,9 @@ export default function CustomersPage() {
                         <div key={s.id} className="flex justify-between text-sm border rounded-lg p-2">
                           <div>
                             <span className="font-mono text-xs">{s.receiptNumber}</span>
-                            <span className="text-muted-foreground ml-2">{new Date(s.date).toLocaleDateString()}</span>
+                            <span className="text-muted-foreground ml-2">{new Date(s.date).toLocaleDateString('fr-FR')}</span>
                           </div>
-                          <span className="font-medium">${s.total.toFixed(2)}</span>
+                          <span className="font-medium">{formatCFA(s.total)}</span>
                         </div>
                       ))}
                     </div>

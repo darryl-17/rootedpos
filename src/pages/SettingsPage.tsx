@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { Settings, Building2, Receipt, CreditCard, Sliders, Link2, Download } from 'lucide-react';
+import { Settings, Building2, CreditCard, Link2, Download } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { getData, setData } from '@/lib/mock-data';
 import { BusinessSettings, TaxRate } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SettingsPage() {
@@ -69,7 +69,11 @@ export default function SettingsPage() {
               <div><Label>Address</Label><Input value={settings.address} onChange={e => saveSettings({ ...settings, address: e.target.value })} /></div>
               <div className="grid sm:grid-cols-3 gap-4">
                 <div><Label>Phone</Label><Input value={settings.phone} onChange={e => saveSettings({ ...settings, phone: e.target.value })} /></div>
-                <div><Label>Currency</Label><Input value={settings.currency} onChange={e => saveSettings({ ...settings, currency: e.target.value })} /></div>
+                <div>
+                  <Label>Currency</Label>
+                  <Input value={settings.currency} onChange={e => saveSettings({ ...settings, currency: e.target.value })} disabled />
+                  <p className="text-xs text-muted-foreground mt-1">Franc CFA (XOF)</p>
+                </div>
                 <div><Label>Timezone</Label><Input value={settings.timezone} onChange={e => saveSettings({ ...settings, timezone: e.target.value })} /></div>
               </div>
             </CardContent>
@@ -155,12 +159,12 @@ export default function SettingsPage() {
                   <p className="text-center font-bold text-sm">{settings.receiptHeader}</p>
                   {settings.showTaxNumber && <p className="text-center text-muted-foreground">{settings.taxNumber}</p>}
                   <Separator />
-                  <p>1x Espresso Coffee        $3.50</p>
-                  <p>2x Croissant              $5.60</p>
+                  <p>1x Espresso Coffee    {formatCFA(1500)}</p>
+                  <p>2x Croissant          {formatCFA(2400)}</p>
                   <Separator />
-                  <p>Subtotal:                 $9.10</p>
-                  <p>Tax:                      $1.75</p>
-                  <p className="font-bold">Total:                   $10.85</p>
+                  <p>Subtotal:             {formatCFA(3900)}</p>
+                  <p>Tax:                  {formatCFA(750)}</p>
+                  <p className="font-bold">Total:               {formatCFA(4650)}</p>
                   <Separator />
                   <p>Payment: Cash</p>
                   {settings.showCashierName && <p>Cashier: Alice Johnson</p>}
