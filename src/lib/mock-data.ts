@@ -176,7 +176,7 @@ export function seedData() {
 
 export function getData<T>(key: string): T {
   const raw = localStorage.getItem(`swiftpos_${key}`);
-  return raw ? JSON.parse(raw) : [];
+  return raw ? JSON.parse(raw) : ([] as unknown as T);
 }
 
 export function setData<T>(key: string, data: T) {
