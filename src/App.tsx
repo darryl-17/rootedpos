@@ -21,11 +21,15 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-function AuthGuard({ children }: { children: React.ReactNode }) {
+function ProtectedLayout() {
   const { isAuthenticated, loadSession } = useAuthStore();
-  useEffect(() => { loadSession(); }, []);
-  if (!isAuthenticated) return <Navigate to="/" replace />;
-  return <>{children}</>;
+  
+  useEffect(() => { loadSession(); }, [loadSession]);
+  
+  const sessionRaw = localStorage.getItem('swiftpos_session');
+  if (!isAuthenticated && !sessionRaw) return <Navigate to="/" replace />;
+  
+  return <AppLayout />;
 }
 
 const App = () => {
@@ -38,7 +42,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<LoginPage />} />
-            <Route element={<AuthGuard><AppLayout /></AuthGuard>}>
+            <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/pos" element={<POSPage />} />
               <Route path="/inventory" element={<InventoryPage />} />
