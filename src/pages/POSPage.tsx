@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { Package } from 'lucide-react';
 import { Search, ShoppingCart, Pause, Clock, Trash2, Plus, Minus, X, Banknote, CreditCard, Smartphone, FileText, Printer, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
