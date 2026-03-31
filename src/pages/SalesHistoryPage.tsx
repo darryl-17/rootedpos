@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { getData, setData } from '@/lib/mock-data';
 import { Sale } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 
 export default function SalesHistoryPage() {
@@ -79,11 +80,11 @@ export default function SalesHistoryPage() {
                 {filtered.map(s => (
                   <tr key={s.id} className="border-b last:border-0 hover:bg-muted/30 cursor-pointer" onClick={() => setSelectedSale(s)}>
                     <td className="p-3 font-mono text-xs">{s.receiptNumber}</td>
-                    <td className="p-3 text-muted-foreground">{new Date(s.date).toLocaleString()}</td>
+                    <td className="p-3 text-muted-foreground">{new Date(s.date).toLocaleString('fr-FR')}</td>
                     <td className="p-3">{s.cashier}</td>
                     <td className="p-3 text-muted-foreground">{s.customerName || '—'}</td>
                     <td className="p-3 text-right">{s.items.length}</td>
-                    <td className="p-3 text-right font-medium">${s.total.toFixed(2)}</td>
+                    <td className="p-3 text-right font-medium">{formatCFA(s.total)}</td>
                     <td className="p-3 text-center capitalize"><Badge variant="secondary">{s.paymentMethod}</Badge></td>
                     <td className="p-3 text-center">{s.refunded ? <Badge variant="destructive">Refunded</Badge> : <Badge variant="default">Completed</Badge>}</td>
                   </tr>
@@ -94,7 +95,6 @@ export default function SalesHistoryPage() {
         </Card>
       )}
 
-      {/* Receipt Detail */}
       <Dialog open={!!selectedSale} onOpenChange={() => setSelectedSale(null)}>
         <DialogContent className="max-w-sm">
           {selectedSale && (
@@ -104,19 +104,19 @@ export default function SalesHistoryPage() {
                 <div className="text-center border-b pb-3">
                   <p className="font-bold text-lg">SwiftPOS Store</p>
                   <p className="text-muted-foreground text-xs">{selectedSale.receiptNumber}</p>
-                  <p className="text-muted-foreground text-xs">{new Date(selectedSale.date).toLocaleString()}</p>
+                  <p className="text-muted-foreground text-xs">{new Date(selectedSale.date).toLocaleString('fr-FR')}</p>
                 </div>
                 {selectedSale.items.map((item, i) => (
                   <div key={i} className="flex justify-between">
                     <span>{item.quantity}x {item.productName}</span>
-                    <span>${item.total.toFixed(2)}</span>
+                    <span>{formatCFA(item.total)}</span>
                   </div>
                 ))}
                 <Separator />
-                <div className="flex justify-between"><span>Subtotal</span><span>${selectedSale.subtotal.toFixed(2)}</span></div>
-                {selectedSale.discount > 0 && <div className="flex justify-between"><span>Discount</span><span>-${selectedSale.discount.toFixed(2)}</span></div>}
-                <div className="flex justify-between"><span>Tax</span><span>${selectedSale.tax.toFixed(2)}</span></div>
-                <div className="flex justify-between font-bold text-base"><span>Total</span><span>${selectedSale.total.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Subtotal</span><span>{formatCFA(selectedSale.subtotal)}</span></div>
+                {selectedSale.discount > 0 && <div className="flex justify-between"><span>Discount</span><span>-{formatCFA(selectedSale.discount)}</span></div>}
+                <div className="flex justify-between"><span>Tax</span><span>{formatCFA(selectedSale.tax)}</span></div>
+                <div className="flex justify-between font-bold text-base"><span>Total</span><span>{formatCFA(selectedSale.total)}</span></div>
                 <div className="text-center text-xs text-muted-foreground pt-2">
                   <p>Cashier: {selectedSale.cashier}</p>
                   <p className="capitalize">Payment: {selectedSale.paymentMethod}</p>
@@ -132,13 +132,12 @@ export default function SalesHistoryPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Refund Confirmation */}
       <AlertDialog open={!!refundSale} onOpenChange={() => setRefundSale(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Process Refund?</AlertDialogTitle>
             <AlertDialogDescription>
-              Refund receipt {refundSale?.receiptNumber} for ${refundSale?.total.toFixed(2)}? This action cannot be undone.
+              Refund receipt {refundSale?.receiptNumber} for {formatCFA(refundSale?.total || 0)}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

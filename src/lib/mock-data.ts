@@ -27,16 +27,16 @@ export const defaultEmployees: Employee[] = [
 ];
 
 export const defaultProducts: Product[] = [
-  { id: 'prod-1', name: 'Espresso Coffee', sku: 'FD-001', category: 'cat-1', description: 'Rich espresso shot', price: 3.50, cost: 1.20, taxRate: 19.25, barcode: '1000000001', image: '', trackInventory: true, stock: 150, lowStockThreshold: 20, active: true, storeId: 'store-1' },
-  { id: 'prod-2', name: 'Croissant', sku: 'FD-002', category: 'cat-1', description: 'Butter croissant', price: 2.80, cost: 0.90, taxRate: 19.25, barcode: '1000000002', image: '', trackInventory: true, stock: 45, lowStockThreshold: 10, active: true, storeId: 'store-1' },
-  { id: 'prod-3', name: 'Fresh Orange Juice', sku: 'FD-003', category: 'cat-1', description: 'Freshly squeezed', price: 4.50, cost: 1.80, taxRate: 9, barcode: '1000000003', image: '', trackInventory: true, stock: 60, lowStockThreshold: 15, active: true, storeId: 'store-1' },
-  { id: 'prod-4', name: 'USB-C Cable', sku: 'EL-001', category: 'cat-2', description: '1m braided cable', price: 12.99, cost: 4.50, taxRate: 19.25, barcode: '2000000001', image: '', trackInventory: true, stock: 80, lowStockThreshold: 10, active: true, storeId: 'store-1' },
-  { id: 'prod-5', name: 'Wireless Earbuds', sku: 'EL-002', category: 'cat-2', description: 'Bluetooth 5.0', price: 29.99, cost: 12.00, taxRate: 19.25, barcode: '2000000002', image: '', trackInventory: true, stock: 25, lowStockThreshold: 5, active: true, storeId: 'store-1' },
-  { id: 'prod-6', name: 'Phone Case', sku: 'EL-003', category: 'cat-2', description: 'Silicone protective case', price: 9.99, cost: 2.50, taxRate: 19.25, barcode: '2000000003', image: '', trackInventory: true, stock: 8, lowStockThreshold: 10, active: true, storeId: 'store-1' },
-  { id: 'prod-7', name: 'Cotton T-Shirt', sku: 'CL-001', category: 'cat-3', description: '100% cotton, unisex', price: 19.99, cost: 6.00, taxRate: 19.25, barcode: '3000000001', image: '', trackInventory: true, stock: 40, lowStockThreshold: 8, active: true, storeId: 'store-1' },
-  { id: 'prod-8', name: 'Denim Jeans', sku: 'CL-002', category: 'cat-3', description: 'Classic fit', price: 49.99, cost: 18.00, taxRate: 19.25, barcode: '3000000002', image: '', trackInventory: true, stock: 15, lowStockThreshold: 5, active: true, storeId: 'store-1' },
-  { id: 'prod-9', name: 'Moisturizing Cream', sku: 'BT-001', category: 'cat-4', description: 'Daily moisturizer 50ml', price: 14.99, cost: 5.00, taxRate: 9, barcode: '4000000001', image: '', trackInventory: true, stock: 35, lowStockThreshold: 8, active: true, storeId: 'store-1' },
-  { id: 'prod-10', name: 'Lip Balm Set', sku: 'BT-002', category: 'cat-4', description: 'Set of 3 flavors', price: 8.99, cost: 2.80, taxRate: 9, barcode: '4000000002', image: '', trackInventory: true, stock: 50, lowStockThreshold: 12, active: true, storeId: 'store-1' },
+  { id: 'prod-1', name: 'Espresso Coffee', sku: 'FD-001', category: 'cat-1', description: 'Rich espresso shot', price: 1500, cost: 600, taxRate: 19.25, barcode: '1000000001', image: '', trackInventory: true, stock: 150, lowStockThreshold: 20, active: true, storeId: 'store-1' },
+  { id: 'prod-2', name: 'Croissant', sku: 'FD-002', category: 'cat-1', description: 'Butter croissant', price: 1200, cost: 450, taxRate: 19.25, barcode: '1000000002', image: '', trackInventory: true, stock: 45, lowStockThreshold: 10, active: true, storeId: 'store-1' },
+  { id: 'prod-3', name: 'Fresh Orange Juice', sku: 'FD-003', category: 'cat-1', description: 'Freshly squeezed', price: 2000, cost: 800, taxRate: 9, barcode: '1000000003', image: '', trackInventory: true, stock: 60, lowStockThreshold: 15, active: true, storeId: 'store-1' },
+  { id: 'prod-4', name: 'USB-C Cable', sku: 'EL-001', category: 'cat-2', description: '1m braided cable', price: 5000, cost: 2000, taxRate: 19.25, barcode: '2000000001', image: '', trackInventory: true, stock: 80, lowStockThreshold: 10, active: true, storeId: 'store-1' },
+  { id: 'prod-5', name: 'Wireless Earbuds', sku: 'EL-002', category: 'cat-2', description: 'Bluetooth 5.0', price: 15000, cost: 6000, taxRate: 19.25, barcode: '2000000002', image: '', trackInventory: true, stock: 25, lowStockThreshold: 5, active: true, storeId: 'store-1' },
+  { id: 'prod-6', name: 'Phone Case', sku: 'EL-003', category: 'cat-2', description: 'Silicone protective case', price: 3500, cost: 1200, taxRate: 19.25, barcode: '2000000003', image: '', trackInventory: true, stock: 8, lowStockThreshold: 10, active: true, storeId: 'store-1' },
+  { id: 'prod-7', name: 'Cotton T-Shirt', sku: 'CL-001', category: 'cat-3', description: '100% cotton, unisex', price: 8000, cost: 3000, taxRate: 19.25, barcode: '3000000001', image: '', trackInventory: true, stock: 40, lowStockThreshold: 8, active: true, storeId: 'store-1' },
+  { id: 'prod-8', name: 'Denim Jeans', sku: 'CL-002', category: 'cat-3', description: 'Classic fit', price: 25000, cost: 9000, taxRate: 19.25, barcode: '3000000002', image: '', trackInventory: true, stock: 15, lowStockThreshold: 5, active: true, storeId: 'store-1' },
+  { id: 'prod-9', name: 'Moisturizing Cream', sku: 'BT-001', category: 'cat-4', description: 'Daily moisturizer 50ml', price: 7500, cost: 2500, taxRate: 9, barcode: '4000000001', image: '', trackInventory: true, stock: 35, lowStockThreshold: 8, active: true, storeId: 'store-1' },
+  { id: 'prod-10', name: 'Lip Balm Set', sku: 'BT-002', category: 'cat-4', description: 'Set of 3 flavors', price: 4500, cost: 1400, taxRate: 9, barcode: '4000000002', image: '', trackInventory: true, stock: 50, lowStockThreshold: 12, active: true, storeId: 'store-1' },
 ];
 
 const customerNames = [
@@ -57,7 +57,7 @@ export const defaultCustomers: Customer[] = customerNames.map(([first, last], i)
   notes: '',
   loyaltyPoints: Math.floor(Math.random() * 500) + 10,
   totalVisits: Math.floor(Math.random() * 30) + 1,
-  totalSpent: Math.round((Math.random() * 800 + 50) * 100) / 100,
+  totalSpent: Math.round(Math.random() * 400000 + 25000),
   lastVisit: new Date(Date.now() - Math.random() * 14 * 86400000).toISOString(),
 }));
 
@@ -85,8 +85,8 @@ function generateSales(): Sale[] {
       items.push({ productId: p.id, productName: p.name, quantity: qty, unitPrice: p.price, total: lineTotal, taxRate: p.taxRate });
     }
 
-    const discount = Math.random() > 0.7 ? Math.round(Math.random() * 5 * 100) / 100 : 0;
-    const total = Math.round((subtotal - discount + taxTotal) * 100) / 100;
+    const discount = Math.random() > 0.7 ? Math.round(Math.random() * 2000) : 0;
+    const total = Math.round(subtotal - discount + taxTotal);
     const method = methods[Math.floor(Math.random() * methods.length)];
     const cust = Math.random() > 0.4 ? defaultCustomers[Math.floor(Math.random() * defaultCustomers.length)] : undefined;
 
@@ -99,14 +99,14 @@ function generateSales(): Sale[] {
       customerId: cust?.id,
       customerName: cust ? `${cust.firstName} ${cust.lastName}` : undefined,
       items,
-      subtotal: Math.round(subtotal * 100) / 100,
+      subtotal: Math.round(subtotal),
       discount,
       discountType: 'fixed',
-      tax: Math.round(taxTotal * 100) / 100,
+      tax: Math.round(taxTotal),
       total,
       paymentMethod: method,
-      cashTendered: method === 'cash' ? Math.ceil(total / 5) * 5 : undefined,
-      change: method === 'cash' ? Math.round((Math.ceil(total / 5) * 5 - total) * 100) / 100 : undefined,
+      cashTendered: method === 'cash' ? Math.ceil(total / 500) * 500 : undefined,
+      change: method === 'cash' ? Math.ceil(total / 500) * 500 - total : undefined,
       note: '',
       storeId: 'store-1',
     });
@@ -140,7 +140,7 @@ export const defaultBusinessSettings: BusinessSettings = {
   address: '123 Commerce St, Downtown',
   phone: '+1 555-0100',
   email: 'info@swiftpos.com',
-  currency: 'USD',
+  currency: 'XOF',
   timezone: 'America/New_York',
   logo: '',
   receiptHeader: 'SwiftPOS Store',
@@ -156,7 +156,10 @@ export const defaultBusinessSettings: BusinessSettings = {
 };
 
 export function seedData() {
-  if (!localStorage.getItem('swiftpos_seeded')) {
+  const SEED_VERSION = 'v2-cfa';
+  if (localStorage.getItem('swiftpos_seed_version') !== SEED_VERSION) {
+    // Clear old data and re-seed with CFA prices
+    Object.keys(localStorage).filter(k => k.startsWith('swiftpos_')).forEach(k => localStorage.removeItem(k));
     localStorage.setItem('swiftpos_products', JSON.stringify(defaultProducts));
     localStorage.setItem('swiftpos_categories', JSON.stringify(defaultCategories));
     localStorage.setItem('swiftpos_customers', JSON.stringify(defaultCustomers));
@@ -170,7 +173,7 @@ export function seedData() {
     localStorage.setItem('swiftpos_businessSettings', JSON.stringify(defaultBusinessSettings));
     localStorage.setItem('swiftpos_heldOrders', JSON.stringify([]));
     localStorage.setItem('swiftpos_currentStore', 'store-1');
-    localStorage.setItem('swiftpos_seeded', 'true');
+    localStorage.setItem('swiftpos_seed_version', SEED_VERSION);
   }
 }
 

@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { getData } from '@/lib/mock-data';
 import { Sale, Product, Customer } from '@/lib/types';
 import { useAuthStore } from '@/stores/auth-store';
+import { formatCFA } from '@/lib/currency';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function DashboardPage() {
@@ -24,19 +25,17 @@ export default function DashboardPage() {
 
   const lowStock = products.filter(p => p.trackInventory && p.stock <= p.lowStockThreshold);
 
-  // Sales last 7 days chart
   const chartData = useMemo(() => {
     const days: { date: string; total: number }[] = [];
     for (let i = 6; i >= 0; i--) {
       const d = new Date(Date.now() - i * 86400000);
       const key = d.toDateString();
       const dayTotal = sales.filter(s => new Date(s.date).toDateString() === key).reduce((sum, s) => sum + s.total, 0);
-      days.push({ date: d.toLocaleDateString('en-US', { weekday: 'short', day: 'numeric' }), total: Math.round(dayTotal * 100) / 100 });
+      days.push({ date: d.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric' }), total: Math.round(dayTotal) });
     }
     return days;
   }, [sales]);
 
-  // Top selling products
   const topProducts = useMemo(() => {
     const map = new Map<string, { name: string; qty: number; revenue: number }>();
     sales.forEach(s => s.items.forEach(i => {
@@ -49,8 +48,8 @@ export default function DashboardPage() {
   }, [sales]);
 
   const kpis = [
-    { label: 'Sales Today', value: `$${todayRevenue.toFixed(2)}`, icon: DollarSign, color: 'text-primary' },
-    { label: 'Monthly Revenue', value: `$${monthRevenue.toFixed(2)}`, icon: TrendingUp, color: 'text-success' },
+    { label: 'Sales Today', value: formatCFA(todayRevenue), icon: DollarSign, color: 'text-primary' },
+    { label: 'Monthly Revenue', value: formatCFA(monthRevenue), icon: TrendingUp, color: 'text-success' },
     { label: 'Active Products', value: products.filter(p => p.active).length, icon: Package, color: 'text-chart-4' },
     { label: 'Low Stock Alerts', value: lowStock.length, icon: AlertTriangle, color: 'text-warning' },
     { label: 'Customers', value: customers.length, icon: Users, color: 'text-chart-1' },
@@ -66,7 +65,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {kpis.map(k => (
           <Card key={k.label}>
@@ -75,13 +73,12 @@ export default function DashboardPage() {
                 <span className="text-xs font-medium text-muted-foreground">{k.label}</span>
                 <k.icon className={`h-4 w-4 ${k.color}`} />
               </div>
-              <p className="text-xl font-bold">{k.value}</p>
+              <p className="text-lg font-bold">{k.value}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Quick Actions */}
       <div className="flex gap-2 flex-wrap">
         <Button onClick={() => navigate('/pos')} className="gap-2"><ShoppingCart className="h-4 w-4" />New Sale</Button>
         <Button variant="secondary" onClick={() => navigate('/inventory')} className="gap-2"><Plus className="h-4 w-4" />Add Product</Button>
@@ -90,7 +87,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Sales Chart */}
         <Card className="lg:col-span-2">
           <CardHeader><CardTitle className="text-base">Sales — Last 7 Days</CardTitle></CardHeader>
           <CardContent>
@@ -99,14 +95,13 @@ export default function DashboardPage() {
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="date" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
                 <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
-                <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} />
+                <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 8 }} formatter={(value: number) => [formatCFA(value), 'Total']} />
                 <Line type="monotone" dataKey="total" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 4, fill: 'hsl(var(--primary))' }} />
               </LineChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Top Products */}
         <Card>
           <CardHeader><CardTitle className="text-base">Top Selling Products</CardTitle></CardHeader>
           <CardContent className="space-y-3">
@@ -119,14 +114,13 @@ export default function DashboardPage() {
                     <p className="text-xs text-muted-foreground">{p.qty} sold</p>
                   </div>
                 </div>
-                <span className="text-sm font-semibold">${p.revenue.toFixed(2)}</span>
+                <span className="text-sm font-semibold">{formatCFA(p.revenue)}</span>
               </div>
             ))}
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Transactions */}
       <Card>
         <CardHeader><CardTitle className="text-base">Recent Transactions</CardTitle></CardHeader>
         <CardContent>
@@ -148,9 +142,9 @@ export default function DashboardPage() {
                     <td className="py-2 font-mono text-xs">{s.receiptNumber}</td>
                     <td className="py-2">{s.cashier}</td>
                     <td className="py-2">{s.items.length}</td>
-                    <td className="py-2 text-right font-medium">${s.total.toFixed(2)}</td>
+                    <td className="py-2 text-right font-medium">{formatCFA(s.total)}</td>
                     <td className="py-2 capitalize">{s.paymentMethod}</td>
-                    <td className="py-2 text-right text-muted-foreground">{new Date(s.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td className="py-2 text-right text-muted-foreground">{new Date(s.date).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</td>
                   </tr>
                 ))}
               </tbody>
