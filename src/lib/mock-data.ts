@@ -140,7 +140,7 @@ export const defaultBusinessSettings: BusinessSettings = {
   address: '123 Commerce St, Downtown',
   phone: '+1 555-0100',
   email: 'info@swiftpos.com',
-  currency: 'USD',
+  currency: 'XOF',
   timezone: 'America/New_York',
   logo: '',
   receiptHeader: 'SwiftPOS Store',
