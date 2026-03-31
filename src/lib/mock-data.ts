@@ -86,7 +86,7 @@ function generateSales(): Sale[] {
     }
 
     const discount = Math.random() > 0.7 ? Math.round(Math.random() * 2000) : 0;
-    const total = Math.round((subtotal - discount + taxTotal) * 100) / 100;
+    const total = Math.round(subtotal - discount + taxTotal);
     const method = methods[Math.floor(Math.random() * methods.length)];
     const cust = Math.random() > 0.4 ? defaultCustomers[Math.floor(Math.random() * defaultCustomers.length)] : undefined;
 
