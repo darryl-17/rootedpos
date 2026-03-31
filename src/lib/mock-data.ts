@@ -156,7 +156,10 @@ export const defaultBusinessSettings: BusinessSettings = {
 };
 
 export function seedData() {
-  if (!localStorage.getItem('swiftpos_seeded')) {
+  const SEED_VERSION = 'v2-cfa';
+  if (localStorage.getItem('swiftpos_seed_version') !== SEED_VERSION) {
+    // Clear old data and re-seed with CFA prices
+    Object.keys(localStorage).filter(k => k.startsWith('swiftpos_')).forEach(k => localStorage.removeItem(k));
     localStorage.setItem('swiftpos_products', JSON.stringify(defaultProducts));
     localStorage.setItem('swiftpos_categories', JSON.stringify(defaultCategories));
     localStorage.setItem('swiftpos_customers', JSON.stringify(defaultCustomers));
