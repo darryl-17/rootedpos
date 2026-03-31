@@ -1,9 +1,9 @@
 import { useState, useMemo } from 'react';
 import { Package } from 'lucide-react';
-import { Search, ShoppingCart, Pause, Clock, Trash2, Plus, Minus, X, Banknote, CreditCard, Smartphone, FileText, Printer, Mail } from 'lucide-react';
+import { Search, ShoppingCart, Pause, Clock, Trash2, Plus, Minus, X, Banknote, CreditCard, Smartphone, Printer, Mail } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -14,6 +14,7 @@ import { usePOSStore } from '@/stores/pos-store';
 import { useAuthStore } from '@/stores/auth-store';
 import { getData, setData } from '@/lib/mock-data';
 import { Product, Category, Customer, Sale, SaleItem } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -34,7 +35,6 @@ export default function POSPage() {
   const [payMethod, setPayMethod] = useState<'cash' | 'card' | 'mobile'>('cash');
   const [cashTendered, setCashTendered] = useState('');
   const [lastSale, setLastSale] = useState<Sale | null>(null);
-  const [customerSearch, setCustomerSearch] = useState('');
 
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.barcode.includes(search);
@@ -42,18 +42,13 @@ export default function POSPage() {
     return matchSearch && matchCat;
   });
 
-  const filteredCustomers = customers.filter(c =>
-    `${c.firstName} ${c.lastName}`.toLowerCase().includes(customerSearch.toLowerCase()) ||
-    c.email.toLowerCase().includes(customerSearch.toLowerCase())
-  );
-
   const completeSale = () => {
     if (pos.cart.length === 0) return;
 
     const total = pos.getTotal();
     const tendered = payMethod === 'cash' ? parseFloat(cashTendered) || 0 : total;
     if (payMethod === 'cash' && tendered < total) {
-      toast({ title: 'Insufficient cash', variant: 'destructive' });
+      toast({ title: 'Montant insuffisant', variant: 'destructive' });
       return;
     }
 
@@ -78,19 +73,18 @@ export default function POSPage() {
       customerId: pos.customerId || undefined,
       customerName: pos.customerName || undefined,
       items: saleItems,
-      subtotal: Math.round(pos.getSubtotal() * 100) / 100,
+      subtotal: Math.round(pos.getSubtotal()),
       discount: pos.discount,
       discountType: pos.discountType,
-      tax: Math.round(pos.getTax() * 100) / 100,
-      total: Math.round(total * 100) / 100,
+      tax: Math.round(pos.getTax()),
+      total: Math.round(total),
       paymentMethod: payMethod,
       cashTendered: payMethod === 'cash' ? tendered : undefined,
-      change: payMethod === 'cash' ? Math.round((tendered - total) * 100) / 100 : undefined,
+      change: payMethod === 'cash' ? Math.round(tendered - total) : undefined,
       note: pos.note,
       storeId: localStorage.getItem('swiftpos_currentStore') || 'store-1',
     };
 
-    // Update stock
     const allProducts = getData<Product[]>('products');
     pos.cart.forEach(item => {
       const idx = allProducts.findIndex(p => p.id === item.product.id);
@@ -127,7 +121,6 @@ export default function POSPage() {
           </Button>
         </div>
 
-        {/* Category filter */}
         <div className="px-4 py-2 flex gap-2 overflow-x-auto border-b">
           <button
             onClick={() => setCatFilter('all')}
@@ -142,7 +135,6 @@ export default function POSPage() {
           ))}
         </div>
 
-        {/* Product grid */}
         <ScrollArea className="flex-1">
           <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {filtered.map(p => (
@@ -156,7 +148,7 @@ export default function POSPage() {
                 </div>
                 <p className="text-sm font-medium truncate">{p.name}</p>
                 <div className="flex items-center justify-between mt-1">
-                  <span className="text-sm font-bold text-primary">${p.price.toFixed(2)}</span>
+                  <span className="text-xs font-bold text-primary">{formatCFA(p.price)}</span>
                   <span className={cn('text-xs', p.stock <= p.lowStockThreshold ? 'text-destructive' : 'text-muted-foreground')}>{p.stock} left</span>
                 </div>
               </button>
@@ -187,7 +179,6 @@ export default function POSPage() {
           )}
         </div>
 
-        {/* Customer selector */}
         <div className="px-4 py-2 border-b">
           {pos.customerName ? (
             <div className="flex items-center justify-between bg-secondary rounded-lg px-3 py-2">
@@ -209,7 +200,6 @@ export default function POSPage() {
           )}
         </div>
 
-        {/* Cart items */}
         <ScrollArea className="flex-1">
           {pos.cart.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full py-16 text-muted-foreground">
@@ -223,14 +213,14 @@ export default function POSPage() {
                 <div key={item.product.id} className="flex items-center gap-3 p-2 rounded-lg border bg-card">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{item.product.name}</p>
-                    <p className="text-xs text-muted-foreground">${item.product.price.toFixed(2)} each</p>
+                    <p className="text-xs text-muted-foreground">{formatCFA(item.product.price)} each</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => pos.updateQuantity(item.product.id, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
                     <span className="w-8 text-center text-sm font-medium">{item.quantity}</span>
                     <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => pos.updateQuantity(item.product.id, item.quantity + 1)}><Plus className="h-3 w-3" /></Button>
                   </div>
-                  <span className="text-sm font-semibold w-16 text-right">${(item.product.price * item.quantity).toFixed(2)}</span>
+                  <span className="text-sm font-semibold w-20 text-right">{formatCFA(item.product.price * item.quantity)}</span>
                   <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => pos.removeFromCart(item.product.id)}><X className="h-3 w-3" /></Button>
                 </div>
               ))}
@@ -238,15 +228,14 @@ export default function POSPage() {
           )}
         </ScrollArea>
 
-        {/* Discount + Note */}
         {pos.cart.length > 0 && (
           <div className="px-4 py-2 border-t space-y-2">
             <div className="flex gap-2">
               <Input type="number" min="0" placeholder="Discount" value={pos.discount || ''} onChange={e => pos.setDiscount(parseFloat(e.target.value) || 0, pos.discountType)} className="flex-1" />
               <Select value={pos.discountType} onValueChange={v => pos.setDiscount(pos.discount, v as 'fixed' | 'percent')}>
-                <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
+                <SelectTrigger className="w-28"><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="fixed">$</SelectItem>
+                  <SelectItem value="fixed">FCFA</SelectItem>
                   <SelectItem value="percent">%</SelectItem>
                 </SelectContent>
               </Select>
@@ -255,14 +244,13 @@ export default function POSPage() {
           </div>
         )}
 
-        {/* Totals + Pay */}
         {pos.cart.length > 0 && (
           <div className="p-4 border-t bg-card space-y-2">
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>${pos.getSubtotal().toFixed(2)}</span></div>
-            {pos.getDiscountAmount() > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Discount</span><span className="text-destructive">-${pos.getDiscountAmount().toFixed(2)}</span></div>}
-            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span>${pos.getTax().toFixed(2)}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Subtotal</span><span>{formatCFA(pos.getSubtotal())}</span></div>
+            {pos.getDiscountAmount() > 0 && <div className="flex justify-between text-sm"><span className="text-muted-foreground">Discount</span><span className="text-destructive">-{formatCFA(pos.getDiscountAmount())}</span></div>}
+            <div className="flex justify-between text-sm"><span className="text-muted-foreground">Tax</span><span>{formatCFA(pos.getTax())}</span></div>
             <Separator />
-            <div className="flex justify-between text-lg font-bold"><span>Total</span><span>${pos.getTotal().toFixed(2)}</span></div>
+            <div className="flex justify-between text-lg font-bold"><span>Total</span><span>{formatCFA(pos.getTotal())}</span></div>
             <div className="grid grid-cols-3 gap-2 pt-2">
               <Button variant="outline" className="gap-1.5" onClick={() => { setPayMethod('cash'); setShowPayment(true); }}><Banknote className="h-4 w-4" />Cash</Button>
               <Button variant="outline" className="gap-1.5" onClick={() => { setPayMethod('card'); setShowPayment(true); }}><CreditCard className="h-4 w-4" />Card</Button>
@@ -278,20 +266,20 @@ export default function POSPage() {
           <DialogHeader><DialogTitle>Complete Payment</DialogTitle></DialogHeader>
           <div className="space-y-4">
             <div className="text-center">
-              <p className="text-3xl font-bold">${pos.getTotal().toFixed(2)}</p>
+              <p className="text-3xl font-bold">{formatCFA(pos.getTotal())}</p>
               <Badge className="mt-1 capitalize">{payMethod}</Badge>
             </div>
             {payMethod === 'cash' && (
               <div className="space-y-2">
-                <label className="text-sm font-medium">Cash Tendered</label>
-                <Input type="number" min="0" step="0.01" value={cashTendered} onChange={e => setCashTendered(e.target.value)} autoFocus />
+                <label className="text-sm font-medium">Cash Tendered (FCFA)</label>
+                <Input type="number" min="0" step="100" value={cashTendered} onChange={e => setCashTendered(e.target.value)} autoFocus />
                 {parseFloat(cashTendered) >= pos.getTotal() && (
-                  <p className="text-sm font-medium text-success">Change: ${(parseFloat(cashTendered) - pos.getTotal()).toFixed(2)}</p>
+                  <p className="text-sm font-medium text-success">Change: {formatCFA(parseFloat(cashTendered) - pos.getTotal())}</p>
                 )}
               </div>
             )}
             <Button className="w-full" size="lg" onClick={completeSale}>
-              Charge ${pos.getTotal().toFixed(2)}
+              Charge {formatCFA(pos.getTotal())}
             </Button>
           </div>
         </DialogContent>
@@ -306,23 +294,23 @@ export default function POSPage() {
               <div className="text-center border-b pb-3">
                 <p className="font-bold text-lg">SwiftPOS Store</p>
                 <p className="text-muted-foreground text-xs">{lastSale.receiptNumber}</p>
-                <p className="text-muted-foreground text-xs">{new Date(lastSale.date).toLocaleString()}</p>
+                <p className="text-muted-foreground text-xs">{new Date(lastSale.date).toLocaleString('fr-FR')}</p>
               </div>
               {lastSale.items.map((item, i) => (
                 <div key={i} className="flex justify-between">
                   <span>{item.quantity}x {item.productName}</span>
-                  <span>${item.total.toFixed(2)}</span>
+                  <span>{formatCFA(item.total)}</span>
                 </div>
               ))}
               <Separator />
-              <div className="flex justify-between"><span>Subtotal</span><span>${lastSale.subtotal.toFixed(2)}</span></div>
-              {lastSale.discount > 0 && <div className="flex justify-between"><span>Discount</span><span>-${lastSale.discount.toFixed(2)}</span></div>}
-              <div className="flex justify-between"><span>Tax</span><span>${lastSale.tax.toFixed(2)}</span></div>
-              <div className="flex justify-between font-bold text-base"><span>Total</span><span>${lastSale.total.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Subtotal</span><span>{formatCFA(lastSale.subtotal)}</span></div>
+              {lastSale.discount > 0 && <div className="flex justify-between"><span>Discount</span><span>-{formatCFA(lastSale.discount)}</span></div>}
+              <div className="flex justify-between"><span>Tax</span><span>{formatCFA(lastSale.tax)}</span></div>
+              <div className="flex justify-between font-bold text-base"><span>Total</span><span>{formatCFA(lastSale.total)}</span></div>
               {lastSale.paymentMethod === 'cash' && lastSale.cashTendered && (
                 <>
-                  <div className="flex justify-between"><span>Cash</span><span>${lastSale.cashTendered.toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Change</span><span>${lastSale.change?.toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Cash</span><span>{formatCFA(lastSale.cashTendered)}</span></div>
+                  <div className="flex justify-between"><span>Change</span><span>{formatCFA(lastSale.change || 0)}</span></div>
                 </>
               )}
               <div className="text-center text-xs text-muted-foreground pt-2">
@@ -351,7 +339,7 @@ export default function POSPage() {
                 <div key={o.id} className="border rounded-lg p-3 flex items-center justify-between">
                   <div>
                     <p className="text-sm font-medium">{o.items.length} items · {o.customerName || 'Walk-in'}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(o.createdAt).toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(o.createdAt).toLocaleString('fr-FR')}</p>
                   </div>
                   <div className="flex gap-1">
                     <Button size="sm" onClick={() => { pos.recallOrder(o.id); setShowHeld(false); }}>Recall</Button>

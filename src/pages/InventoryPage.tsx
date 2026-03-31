@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Search, Plus, Package, Edit, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { getData, setData } from '@/lib/mock-data';
 import { Product, Category, StockAdjustment } from '@/lib/types';
+import { formatCFA } from '@/lib/currency';
 import { useToast } from '@/hooks/use-toast';
 
 const emptyProduct: Partial<Product> = {
@@ -98,7 +99,6 @@ export default function InventoryPage() {
     const newAdj = [adj, ...adjustments];
     setAdjustments(newAdj);
     setData('stockAdjustments', newAdj);
-    // Update product stock
     if (p) {
       const newStock = Math.max(0, p.stock + adj.quantity);
       const updatedProducts = products.map(pr => pr.id === p.id ? { ...pr, stock: newStock } : pr);
@@ -159,8 +159,8 @@ export default function InventoryPage() {
                         <td className="p-3 font-medium">{p.name}</td>
                         <td className="p-3 text-muted-foreground font-mono text-xs">{p.sku}</td>
                         <td className="p-3">{categories.find(c => c.id === p.category)?.name}</td>
-                        <td className="p-3 text-right">${p.price.toFixed(2)}</td>
-                        <td className="p-3 text-right text-muted-foreground">${p.cost.toFixed(2)}</td>
+                        <td className="p-3 text-right">{formatCFA(p.price)}</td>
+                        <td className="p-3 text-right text-muted-foreground">{formatCFA(p.cost)}</td>
                         <td className="p-3 text-right">
                           <span className={p.stock <= p.lowStockThreshold ? 'text-destructive font-medium' : ''}>{p.stock}</span>
                         </td>
@@ -227,7 +227,7 @@ export default function InventoryPage() {
                 <tbody>
                   {adjustments.map(a => (
                     <tr key={a.id} className="border-b last:border-0">
-                      <td className="p-3 text-muted-foreground">{new Date(a.date).toLocaleDateString()}</td>
+                      <td className="p-3 text-muted-foreground">{new Date(a.date).toLocaleDateString('fr-FR')}</td>
                       <td className="p-3">{a.productName}</td>
                       <td className="p-3 capitalize"><Badge variant="secondary">{a.type}</Badge></td>
                       <td className="p-3 text-right font-medium">{a.quantity > 0 ? '+' : ''}{a.quantity}</td>
@@ -263,8 +263,8 @@ export default function InventoryPage() {
             </div>
             <div><Label>Description</Label><Textarea value={editProduct.description} onChange={e => setEditProduct({ ...editProduct, description: e.target.value })} /></div>
             <div className="grid grid-cols-3 gap-4">
-              <div><Label>Selling Price *</Label><Input type="number" min="0" step="0.01" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: parseFloat(e.target.value) || 0 })} /></div>
-              <div><Label>Cost Price</Label><Input type="number" min="0" step="0.01" value={editProduct.cost} onChange={e => setEditProduct({ ...editProduct, cost: parseFloat(e.target.value) || 0 })} /></div>
+              <div><Label>Selling Price (FCFA) *</Label><Input type="number" min="0" step="100" value={editProduct.price} onChange={e => setEditProduct({ ...editProduct, price: parseFloat(e.target.value) || 0 })} /></div>
+              <div><Label>Cost Price (FCFA)</Label><Input type="number" min="0" step="100" value={editProduct.cost} onChange={e => setEditProduct({ ...editProduct, cost: parseFloat(e.target.value) || 0 })} /></div>
               <div><Label>Tax Rate (%)</Label><Input type="number" min="0" step="0.01" value={editProduct.taxRate} onChange={e => setEditProduct({ ...editProduct, taxRate: parseFloat(e.target.value) || 0 })} /></div>
             </div>
             <div className="grid grid-cols-2 gap-4">
